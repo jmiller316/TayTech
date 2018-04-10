@@ -3,12 +3,8 @@ utils.py
 
 Miscellaneous functions that we will need.
 """
+import tensorflow as tf
 
-"""
-attention
-"""
-def attention(a, b, num_units=0):
-    return "a", "b"
 
 def learning_rate_decay(init_lr, global_step, warmup_steps=4000.0):
     """
@@ -23,10 +19,20 @@ def learning_rate_decay(init_lr, global_step, warmup_steps=4000.0):
     """# Naomi from tensor2tensor
     step = tf.cast(global_step + 1, dtype=tf.float32)
     return init_lr * warmup_steps**0.5 * tf.minimum(step * warmup_steps**(-1.5), step**(-0.5))"""
-    if global_step < 500000:
-        return 0.001
-    if global_step >= 500000 and global_step < 1000000:
-        return 0.005
-    if global_step >= 1000000 and global_step < 2000000:
-        return 0.0003
-    return 0.0001
+    # Constants for the learning rate
+    r1 = tf.constant(0.001)
+    r2 = tf.constant(0.0005)
+    r3 = tf.constant(0.0003)
+    r4 = tf.constant(0.0001)
+    l1 = tf.constant(500000)
+    l2 = tf.constant(1000000)
+    l3 = tf.constant(2000000)
+    
+    # Compare the values to determine the learning rate
+    if tf.less(global_step, l1):
+        return r1
+    if tf.greater_equal(global_step, l1) and tf.less(global_step, l2):
+        return r2
+    if tf.greater_equal(global_step, l2) and tf.less(global_step, l3):
+        return r3
+    return r4
