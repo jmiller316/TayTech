@@ -6,6 +6,7 @@ Includes the encoder and decoder RNNS
 import tensorflow as tf 
 from config import *
 from cbhg import cbhg_helper
+from utils import attention
 
 def encoder(inputs, is_training=True, scope="encoder"):
     """
@@ -53,3 +54,40 @@ def pre_net(inputs, is_training=True, num_hidden_units=None, scope="Pre-Net"):
         outputs = tf.layers.dense(outputs, units=num_hidden_units[0], activation=tf.nn.relu, name=("dense" + str(i)))
         outputs = tf.layers.dropout(outputs, rate=DROPOUT_RATE, training=is_training, name=("dropout" + str(i)))
     return outputs
+
+def decoder(inputs, memory, is_training=True, scope="decoder"):
+    """
+    Takes the output from the encoder, runs it thought a prenet, 
+    then processes with attention. After finishing the attention,
+    generates the decoder RNN.
+
+    Although the decoder could directly target the raw spectogram, this would
+    be a highly redundant representation for the purpose of learning alignment 
+    between speech signal and text. Thus the target is an 80-band mel-scale 
+    spectogram, though fewer bands or more concise targets such as 
+    cepstrum could be used.
+    """
+    with tf.variable_scope(scope):
+        inputs = pre_net(inputs, is_training=is_training)
+
+        # With Attention
+        outputs, state = attention(inputs, memory, num_units=EMBED_SIZE)
+
+        # Transpose
+        alignments = tf.transpose(state.alignment_history.stack(), [1,2,0])
+
+        # Decoder RNNs - 2-Layer Resiedual GRU (256 cells)
+        outputs += decoder_rnn(outputs, scope="decoder_rnn1")
+        outputs += decoder_rnn(outputs, scope="decoder_rnn2")
+        
+        # An 80-band mel-scale spectogram is the target
+        mel_hats = tf.layers.dense(outputs, N_MELS*REDUCTION_FACTOR)
+    return mel_hats, alignments
+
+def decoder_rnn(inputs, scope="decpder_rnn"):
+    """
+    An RNN with GRU cells used in the decoder
+    """
+    with tf.variable_scope(scope):
+        rnn, _ = tf.nn.dynamic_rnn(tf.contrib.rnn.GRUCell(EMBED_SIZE), inputs, dtype=tf.float32)
+    return rnn
