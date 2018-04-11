@@ -34,16 +34,16 @@ def input_load():
         text_lengths.append(len(text))
         texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
         
-    transcript = os.path.join("/data/Collin", 'transcript.csv')
+    transcript = os.path.join("/data/Colin", 'transcript.csv')
     lines = codecs.open(transcript, 'r', 'utf-8').readlines()
     line_number = 0
     for line in lines:
         line_number += 1
         text, fname = line.strip().split("$")
         if not fname:
-            fpath = os.path.join("/data/Collin","C" + line_number + ".wav")
+            fpath = os.path.join("/data/Colin","C" + line_number + ".wav")
         else:
-            fpath = os.path.join("/data/Collin", fname + ".wav")
+            fpath = os.path.join("/data/Colin", fname + ".wav")
             
         fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
 
