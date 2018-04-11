@@ -28,7 +28,7 @@ def attention(inputs, memory, num_units=None, scope="attention_decoder"):
 
     return outputs, state
 
-def learning_rate_decay(init_lr, global_step, warmup_steps=4000.0):
+def learning_rate_decay(global_step, warmup_steps=4000.0):
     """
     Learning_rate_decay.
 
