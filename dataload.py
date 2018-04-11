@@ -6,14 +6,14 @@ Created on Mon Apr  9 21:18:54 2018
 """
 import numpy as np
 import tensorflow as tf
-from utils import *
+from utils import create_vocab, normalize_text, create_spectrograms
 import codecs
 import os
 from config import *
 
 def input_load():
     #creates vocab conversion dictionaries
-    char2idx, idx2char = create_vocab()
+    char2idx, _ = create_vocab()
     fpaths, text_lengths, texts = [], [], []
     
     transcript = os.path.join("/data/Garret", 'transcript.csv')
@@ -90,8 +90,8 @@ def get_batch():
         
         fname.set_shape(())
         text.set_shape((None,))
-        mel.set_shape((None, n_mels*hp.r))
-        mag.set_shape((None, n_fft//2+1))
+        mel.set_shape((None, N_MELS*REDUCTION_FACTOR))
+        mag.set_shape((None, N_FFT//2+1))
         
         # Parse
         text = tf.decode_raw(text, tf.int32)  # (None,)
@@ -102,7 +102,7 @@ def get_batch():
                                             batch_size=16,
                                             bucket_boundaries=[i for i in range(minlen + 1, maxlen - 1, 20)],
                                             num_threads=16,
-                                            capacity= batch_size * 4,
+                                            capacity= BATCH_SIZE * 4,
                                             dynamic_pad=True)
         
         return texts, mels, mags, fnames, num_batch
