@@ -17,6 +17,7 @@ DROPOUT_RATE = 0.5
 REDUCTION_FACTOR = 2 # This value can be changed. In the Tacotron paper, 
                      # the number 2 was used. The paper said, however,
                      # that numbers as large as 5 worked well
+LOG_DIR = '/data_model'
 
 # Signal Processing
 # JARED we need to look at these values since they depend on the data
@@ -34,3 +35,4 @@ POWER = 1.2 # Exponent for amplifying the predicted magnitude
 N_ITER = 50 # Number of inversion iterations
 PREEMPHASIS = .97 # or None
 BATCH_SIZE = 32
+CHECK_VALS = 1000
