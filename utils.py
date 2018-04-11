@@ -11,6 +11,22 @@ from scipy import signal
 import copy
 from config import *
 
+def attention(inputs, memory, num_units=None, scope="attention_decoder", reuse=None):
+    with tf.variable_scope(scope, reuse=reuse):
+        if num_units is None:
+            num_units = inputs.get_shape().as_list[-1]
+        
+        attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(num_units, 
+                                                                   memory)
+        decoder_cell = tf.contrib.rnn.GRUCell(num_units)
+        cell_with_attention = tf.contrib.seq2seq.AttentionWrapper(decoder_cell,
+                                                                  attention_mechanism,
+                                                                  num_units,
+                                                                  alignment_history=True)
+        outputs, state = tf.nn.dynamic_rnn(cell_with_attention, inputs, dtype=tf.float32) #( N, T', 16)
+
+    return outputs, state
+
 def learning_rate_decay(init_lr, global_step, warmup_steps=4000.0):
     """
     Learning_rate_decay.
