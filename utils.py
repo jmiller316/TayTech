@@ -9,15 +9,16 @@ import numpy as np
 import os
 from scipy import signal
 import copy
-from config import *
+from config import MAX_DB, REDUCTION_FACTOR,REF_DB, WIN_LENGTH, \
+    N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR
 
-def attention(inputs, memory, num_units=None, scope="attention_decoder", reuse=None):
-    with tf.variable_scope(scope, reuse=reuse):
+def attention(inputs, memory, num_units=None, scope="attention_decoder"):
+    with tf.variable_scope(scope):
         if num_units is None:
             num_units = inputs.get_shape().as_list[-1]
         
         attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(num_units, 
-                                                                   memory)
+                                                                   memory),
         decoder_cell = tf.contrib.rnn.GRUCell(num_units)
         cell_with_attention = tf.contrib.seq2seq.AttentionWrapper(decoder_cell,
                                                                   attention_mechanism,
