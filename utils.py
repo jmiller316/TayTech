@@ -4,13 +4,14 @@ utils.py
 Miscellaneous functions that we will need.
 """
 import tensorflow as tf
+import matplotlib.pyplot as plt
 import librosa
 import numpy as np
 import os
 from scipy import signal
 import copy
 from config import MAX_DB,REF_DB, WIN_LENGTH, \
-    N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR
+    N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR, LOG_DIR, CHECK_VALS
 
 def attention(inputs, memory, num_units=None, scope="attention_decoder"):
     with tf.variable_scope(scope):
@@ -59,7 +60,18 @@ def learning_rate_decay(global_step, warmup_steps=4000.0):
         return r3
     return r4
 
-"""
+def plot_alignments(alignment, global_step):
+    """
+    Plots the alignments
+    """
+    fig, ax = plt.subplot()
+    im = ax.imshow(alignment)
+
+    fig.colorbar(im)
+    plt.title(str(global_step) + " global steps")
+    plt.savefig(LOG_DIR + 'alignment_' + str(global_step//CHECK_VALS) + '_k.png', format='png')
+
+"""     
 text input edit
 """
 def create_vocab():

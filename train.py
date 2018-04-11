@@ -1,5 +1,6 @@
 from model import Model
 import tensorflow as tf
+from utils import plot_alignments
 from config import LOG_DIR, CHECK_VALS
 from tqdm import tqdm
 import os
@@ -27,7 +28,7 @@ def train():
 
                     # plot the first alignment for logging
                     align = sess.run(g.alignments)
-                    #plot_alignment(align[0], global_step)
+                    plot_alignment(align[0], global_step)
 
 
 if __name__ == '__main__':
