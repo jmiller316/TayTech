@@ -11,10 +11,17 @@ from cbhg import cbhg_helper
 
 class Model:
     """
-    Generate the Tensorflow model
+    Generate the Tensorflow graph
     """
     def __init__(self, mode="train"):
         self.mode = mode
+        # Initialize values used in function
+        self.global_step = None
+        self.mel_loss = None
+        self.mel_loss = None
+        self.mag_loss = None
+        self.learn_rate = None
+        self.merged = None
 
         # If is_training
         if mode=="train":

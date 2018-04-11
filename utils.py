@@ -9,7 +9,7 @@ import numpy as np
 import os
 from scipy import signal
 import copy
-from config import MAX_DB, REDUCTION_FACTOR,REF_DB, WIN_LENGTH, \
+from config import MAX_DB,REF_DB, WIN_LENGTH, \
     N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR
 
 def attention(inputs, memory, num_units=None, scope="attention_decoder"):
