@@ -5,7 +5,7 @@ Contains functions for the CBHG module used in the encoder and after
 the decoder. 
 """
 import tensorflow as tf
-from config import *
+from config import EMBED_SIZE, VOCAB_SIZE, DROPOUT_RATE, NUM_HIGHWAY_LAYERS
 
 def cbhg(inputs, lengths, is_training, scope="cbhb", K=16, projections=[EMBED_SIZE//2, EMBED_SIZE//2]):
     """

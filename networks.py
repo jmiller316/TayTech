@@ -4,7 +4,7 @@ networks.py
 Includes the encoder and decoder RNNS
 """
 import tensorflow as tf 
-from config import *
+from config import EMBED_SIZE, VOCAB_SIZE, DROPOUT_RATE, N_MELS, REDUCTION_FACTOR
 from cbhg import cbhg_helper
 from utils import attention
 

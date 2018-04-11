@@ -9,7 +9,7 @@ import tensorflow as tf
 from utils import create_vocab, normalize_text, create_spectrograms
 import codecs
 import os
-from config import *
+from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE
 
 def input_load():
     #creates vocab conversion dictionaries
