@@ -10,6 +10,7 @@ import numpy as np
 import os
 from scipy import signal
 import copy
+from scipy.io import wavfile
 from config import MAX_DB,REF_DB, WIN_LENGTH, \
     N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR, LOG_DIR, CHECK_VALS
 
@@ -177,3 +178,13 @@ def create_spectrograms(fpath):
     mag = np.pad(mag, [[0, num_paddings], [0, 0]], mode="constant")
     
     return fname, mel.reshape((-1, N_MELS*3)), mag
+
+def wav2drawing(fpath):
+    sample_rate, samples = wavfile.read(fpath)
+    frequencies, times, spectogram = signal.spectrogram(samples, sample_rate)
+    
+    plt.pcolormesh(times, frequencies, spectogram)
+    plt.imshow(spectogram)
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.show()
