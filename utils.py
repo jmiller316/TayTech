@@ -13,13 +13,13 @@ import copy
 from config import MAX_DB,REF_DB, WIN_LENGTH, \
     N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR, LOG_DIR, CHECK_VALS
 
+
 def attention(inputs, memory, num_units=None, scope="attention_decoder"):
     with tf.variable_scope(scope):
         if num_units is None:
             num_units = inputs.get_shape().as_list[-1]
         
-        attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(num_units, 
-                                                                   memory),
+        attention_mechanism = tf.contrib.seq2seq.BahdanauAttention(num_units, memory)
         decoder_cell = tf.contrib.rnn.GRUCell(num_units)
         cell_with_attention = tf.contrib.seq2seq.AttentionWrapper(decoder_cell,
                                                                   attention_mechanism,
@@ -29,7 +29,8 @@ def attention(inputs, memory, num_units=None, scope="attention_decoder"):
 
     return outputs, state
 
-def learning_rate_decay(global_step, warmup_steps=4000.0):
+
+def learning_rate_decay(global_step):
     """
     Learning_rate_decay.
 
@@ -39,9 +40,6 @@ def learning_rate_decay(global_step, warmup_steps=4000.0):
     While the rate is hardcoded in here, it can be changed to the Naome from 
     tensor2tensor if it does not work well. 
     """
-    """# Naomi from tensor2tensor
-    step = tf.cast(global_step + 1, dtype=tf.float32)
-    return init_lr * warmup_steps**0.5 * tf.minimum(step * warmup_steps**(-1.5), step**(-0.5))"""
     # Constants for the learning rate
     r1 = tf.constant(0.001)
     r2 = tf.constant(0.0005)
@@ -50,15 +48,28 @@ def learning_rate_decay(global_step, warmup_steps=4000.0):
     l1 = tf.constant(500000)
     l2 = tf.constant(1000000)
     l3 = tf.constant(2000000)
-    
-    # Compare the values to determine the learning rate
-    if tf.less(global_step, l1):
+
+    def ifr1():
         return r1
-    if tf.greater_equal(global_step, l1) and tf.less(global_step, l2):
+
+    def if2():
+        return tf.cond(tf.less(global_step, l2), ifr2, if3)
+
+    def ifr2():
         return r2
-    if tf.greater_equal(global_step, l2) and tf.less(global_step, l3):
+
+    def if3():
+        return tf.cond(tf.less(global_step, l3), ifr3, ifr4)
+
+    def ifr3():
         return r3
-    return r4
+
+    def ifr4():
+        return r4
+
+    return tf.cond(tf.less(global_step, l1),ifr1,if2)
+
+
 
 def plot_alignments(alignment, global_step):
     """
@@ -71,30 +82,33 @@ def plot_alignments(alignment, global_step):
     plt.title(str(global_step) + " global steps")
     plt.savefig(LOG_DIR + 'alignment_' + str(global_step//CHECK_VALS) + '_k.png', format='png')
 
-"""     
-text input edit
-"""
+
 def create_vocab():
+    """
+    text input edit
+    """
     char2idx = {char: idx for idx, char in enumerate(VOCAB)}
     idx2char = {idx: char for idx, char in enumerate(VOCAB)}
     return char2idx,idx2char
 
+
 def normalize_text(text):
-    #room for more normalization depending on transcript data
+    # room for more normalization depending on transcript data
     text = text.lower().replace(",",".")
     return text
-"""
-audio edit
-"""
+
+
 def wav2spectrograms(fpath):
+    """
+    audio edit
+    """
+    y, sample_rate = librosa.load(fpath, sr=SR)                   # load the wav file
     
-    y, sample_rate = librosa.load(fpath, sr=SR)                   #load the wav file
+    y, _ = librosa.effects.trim(y)                          # trimming
     
-    y, _ = librosa.effects.trim(y)                          #trimming
+    y = np.append(y[0], y[1:] - PREEMPHASIS * y[:-1])    # noise reduction technique
     
-    y = np.append(y[0], y[1:] - PREEMPHASIS * y[:-1])    #noise reduction technique
-    
-    linear = librosa.stft(y=y,                              #short time fourier transform to get the linear spectrogram
+    linear = librosa.stft(y=y,                              # short time fourier transform to get the linear spectrogram
                           n_fft=N_FFT,
                           hop_length=HOP_LENGTH,
                           win_length=WIN_LENGTH)
@@ -117,8 +131,9 @@ def wav2spectrograms(fpath):
     
     return mel,mag
 
+
 def spectrogram2wav(spectrogram):
-    '''# Generate wave file from spectrogram'''
+    """# Generate wave file from spectrogram"""
     # transpose
     spectrogram = spectrogram.T
 
@@ -138,9 +153,9 @@ def spectrogram2wav(spectrogram):
     wav, _ = librosa.effects.trim(wav)
     return wav.astype(np.float32)
 
+
 def griffin_lim(spectrogram):
-    '''Applies Griffin-Lim's raw.
-    '''
+    """Applies Griffin-Lim's raw."""
     X_best = copy.deepcopy(spectrogram)
     for i in range(N_ITER):
         X_t = librosa.istft(X_best, HOP_LENGTH, win_length=WIN_LENGTH, window="hann")
@@ -151,6 +166,7 @@ def griffin_lim(spectrogram):
     y = np.real(X_t)
     
     return y
+
 
 def create_spectrograms(fpath):
     fname = os.path.basename(fpath)
