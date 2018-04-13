@@ -87,7 +87,8 @@ def plot_alignments(alignment, global_step):
 
 def create_vocab():
     """
-    text inpu
+    text input
+    """
     char2idx = {char: idx for idx, char in enumerate(VOCAB)}
     idx2char = {idx: char for idx, char in enumerate(VOCAB)}
     return char2idx,idx2char
