@@ -3,10 +3,8 @@ config.py
 
 Several constants used in the project
 """
-#EPOCHS = 0
-#BATCH_SIZE = 1
-#RNN_SIZE = 0
 ENCODING = 'UTF-8'
+NUM_EPOCHS = 20
 # JARED fill this in with the characters you are using and the 
 # number of characters 
 VOCAB_SIZE = 32
@@ -18,14 +16,14 @@ DROPOUT_RATE = 0.5
 REDUCTION_FACTOR = 2 # This value can be changed. In the Tacotron paper, 
                      # the number 2 was used. The paper said, however,
                      # that numbers as large as 5 worked well
-LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\Intro to AI\\Group Project\\data_model'
-DATA_PATH = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\'
+LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data_log'
+DATA_PATH = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project'
 DEVICE = '/cpu:0'
 # Signal Processing
 # JARED we need to look at these values since they depend on the data
 SR = 22050 # Sample rate.
-# 80 band mel scale spetogram
-N_MELS = 80 
+# 80 band mel scale spetrogram
+N_MELS = 80
 N_FFT = 2048 # fft points (samples)
 MAX_DB = 100
 REF_DB = 20
@@ -36,5 +34,5 @@ WIN_LENGTH = int(SR*FRAME_LENGTH) # samples.
 POWER = 1.2 # Exponent for amplifying the predicted magnitude
 N_ITER = 50 # Number of inversion iterations
 PREEMPHASIS = .97 # or None
-BATCH_SIZE = 32
-CHECK_VALS = 1000
+BATCH_SIZE = 20
+CHECK_VALS = 5

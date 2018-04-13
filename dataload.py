@@ -9,7 +9,8 @@ import tensorflow as tf
 from utils import create_vocab, normalize_text, create_spectrograms
 import codecs
 import os
-from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING
+from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING, NUM_EPOCHS
+
 
 
 def input_load():
@@ -19,53 +20,63 @@ def input_load():
 
     base_path = os.path.join(DATA_PATH, 'data')
     base_path_g = os.path.join(base_path, 'Garrett')
-    transcript = os.path.join(base_path_g, 'AudioTranscript.txt')
-    lines = codecs.open(transcript, 'r', ENCODING).readlines()
-    line_number = 0
-    for line in lines:
-        line_number += 1
-        text, fname = line.strip().split("$")
-        if not fname:
-            fpath = os.path.join(base_path_g,
-                                 "G" + line_number + ".wav")
-        else:
-            fpath = os.path.join(base_path_g, fname + ".wav")
-            
-        fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
+    base_path_c = os.path.join(base_path, 'Colin')
+    base_path_d = os.path.join(base_path, 'David')
+    transcript_g = os.path.join(base_path_g, 'AudioTranscript.txt')
+    transcript_c = os.path.join(base_path_c, 'Colin Freeman Audio Text.txt')
+    transcript_d = os.path.join(base_path_d, 'transcript.csv')
 
-        text = normalize_text(text) + "$"  # $: EOS
-        text = [char2idx[char] for char in text]
-        text_lengths.append(len(text))
-        texts.append(np.array(text, np.int32).tostring())
-        
-    """  
+    for _ in range(NUM_EPOCHS):
+        lines = codecs.open(transcript_g, 'r', ENCODING).readlines()
+        line_number = 0
+        for line in lines:
+            if line == "" or line == "\n":
+                continue
+            line_number += 1
+            text, fname = line.strip().split("$")
+            fname = fname.strip()
+            if not fname:
+                fpath = os.path.join(base_path_g,
+                                     "G" + line_number + ".wav")
+            else:
+                fpath = os.path.join(base_path_g, fname)
+
+            fpaths.append(fpath)                                        # queue of fpaths containing all the wavfiles
+
+            text = normalize_text(text) + "$"  # $: EOS
+            text = [char2idx[char] for char in text]
+            text_lengths.append(len(text))
+            texts.append(np.array(text, np.int32).tostring())
+
+        """
+        lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
+        line_number = 0
+        for line in lines:
+            if line == "" or line == "\n":
+                continue
+            line_number += 1
+            print(line_number, line)
+            text, fname = line.strip().split("$")
+            fname = fname.strip()
+            if not fname:
+                fpath = os.path.join(base_path_c,"C" + line_number + ".wav")
+            else:
+                fpath = os.path.join(base_path_c, fname + ".wav")
+
+            fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
+
+            text = normalize_text(text) + "$"  # E: EOS
+            text = [char2idx[char] for char in text]
+            text_lengths.append(len(text))
+            texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
+
     
-    base_path_c = os.path.join(DATA_PATH, 'Colin')
-    transcript = os.path.join(base_path_c, 'transcript.csv')
-    lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+    lines = codecs.open(transcript_d, 'r', 'utf-8').readlines()
     line_number = 0
     for line in lines:
         line_number += 1
         text, fname = line.strip().split("$")
-        if not fname:
-            fpath = os.path.join(base_path_c,"C" + line_number + ".wav")
-        else:
-            fpath = os.path.join(base_path_c, fname + ".wav")
-            
-        fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
-
-        text = normalize_text(text) + "$"  # E: EOS
-        text = [char2idx[char] for char in text]
-        text_lengths.append(len(text))
-        texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
-        
-    base_path_d = os.path.join(DATA_PATH, 'David')
-    transcript = os.path.join(base_path_d, 'transcript.csv')
-    lines = codecs.open(transcript, 'r', 'utf-8').readlines()
-    line_number = 0
-    for line in lines:
-        line_number += 1
-        text, fname = line.strip().split("$")
+        fname = fname.strip()
         if not fname: 
             fpath = os.path.join(base_path_d,"D" + line_number + ".wav")
         else:
@@ -82,9 +93,10 @@ def input_load():
 
 def get_batch():
     with tf.device(DEVICE): #this uses your primary gpu use ('/cpu:0') to use your cpu instead
-        
+
         fpaths, text_lengths, texts = input_load()
         maxlen, minlen = max(text_lengths), min(text_lengths)
+
         num_batch = len(fpaths) // BATCH_SIZE
         
         fpaths = tf.convert_to_tensor(fpaths)
@@ -111,5 +123,5 @@ def get_batch():
                                             num_threads=16,
                                             capacity= BATCH_SIZE * 4,
                                             dynamic_pad=True)
-        
+
         return texts, mels, mags, fnames, num_batch

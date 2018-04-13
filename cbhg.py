@@ -24,17 +24,17 @@ def cbhg(inputs, lengths, is_training, scope="cbhb", K=16, projections=[EMBED_SI
     with tf.variable_scope(scope):
         # Convolutional bank and max pool
         # The input sequence is first convolved with K sets of 1-D convolutional filters.
-        print("Convolutional banks")
+        print("Setting up Convolutional banks...")
         banks = conv1d_banks(inputs, K=K, is_training=is_training)
-        print("Max pooling")
+        print("Preparing for a dip with Max pooling...")
         banks = tf.layers.max_pooling1d(banks, pool_size=2, strides=1, padding="same")
         # Conv1D Layers
-        print("Convolutional Layers")
+        print("Hosting your convolutional filters...")
         banks = conv1d(banks, filters=projections[0], kernel_size=3, scope="conv1d_1", activation_fn=tf.nn.relu, is_training=is_training)
         banks = conv1d(banks, filters=projections[1], kernel_size=3, scope="conv1d_2", activation_fn=None, is_training=is_training)
 
         # Multi-layer highway network
-        print("Highway network")
+        print("Creating your ultimate Highway network...")
         if post:
             # Extra affine transformation for dimensionality sync
             highway_in = tf.layers.dense(banks, projections[0])  #
@@ -44,7 +44,7 @@ def cbhg(inputs, lengths, is_training, scope="cbhb", K=16, projections=[EMBED_SI
         for i in range(0, NUM_HIGHWAY_LAYERS):
             highway_in = highwaynet(highway_in, num_units=projections[0], scope=("highway_net" + str(i)))
 
-        print("GRU RNN")
+        print("How would you like a GRU RNN?...")
         # bidirectional GRU RNN to extract sequential features fromboth
         # forward and backward context
         rnn = cbhg_rnn(inputs,lengths, scope=("cbgh_gru_rnn_" + scope))
@@ -106,7 +106,7 @@ def conv1d(inputs, kernel_size, activation_fn=None, is_training=True, scope="con
     with tf.variable_scope(scope):
         # Create the conv1d
         conv1d_output = tf.layers.conv1d(inputs, 
-                filters=filters,kernel_size=kernel_size,
+                filters=filters,kernel_size=kernel_size, strides=1,
                 activation=activation_fn, padding='same')
     # Batch normalization is used for all convolutional layers
     return tf.layers.batch_normalization(conv1d_output, training=is_training)
@@ -127,13 +127,13 @@ def conv1d_banks(inputs, K=16, is_training=True, scope="conv1d_banks"):
     """
     with tf.variable_scope(scope):
         # The first convolutional filter
-        outputs = conv1d(inputs,  filters=EMBED_SIZE//2, kernel_size=1, 
-                                    is_training=is_training, scope="conv1d_convbanks1") 
-        
+        outputs = conv1d(inputs,  filters=EMBED_SIZE//2, kernel_size=1,
+                                    is_training=is_training, scope="conv1d_convbanks1")
+
         # The next filters until there are k filters
         for k in range(2, K+1):
             with tf.variable_scope("num_{}".format(k)):
-                output = conv1d(inputs, filters=EMBED_SIZE // 2, kernel_size=k, 
+                output = conv1d(inputs, filters=EMBED_SIZE // 2, kernel_size=k,
                                     is_training=is_training, scope="conv1d_convbanks2")
                 outputs = tf.concat((outputs, output), -1)
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
@@ -158,7 +158,6 @@ def highwaynet(inputs, num_units=None, scope="highwaynet"):
         H = tf.layers.dense(inputs, units=num_units, activation=tf.nn.relu, name="R2D2")
         T = tf.layers.dense(inputs, units=num_units, activation=tf.nn.sigmoid,
                             bias_initializer=tf.constant_initializer(-1.0), name="D2R2")
-        TEMP = H*T
         # Highway network layer
         outputs = H*T + inputs*(1.-T)
     return outputs

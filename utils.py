@@ -12,7 +12,8 @@ from scipy import signal
 import copy
 from scipy.io import wavfile
 from config import MAX_DB,REF_DB, WIN_LENGTH, \
-    N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR, LOG_DIR, CHECK_VALS
+    N_FFT, PREEMPHASIS, HOP_LENGTH, N_MELS, N_ITER, VOCAB, SR, LOG_DIR, CHECK_VALS, \
+    REDUCTION_FACTOR
 
 
 def attention(inputs, memory, num_units=None, scope="attention_decoder"):
@@ -70,18 +71,18 @@ def learning_rate_decay(global_step):
 
     return tf.cond(tf.less(global_step, l1),ifr1,if2)
 
-
-
 def plot_alignments(alignment, global_step):
     """
     Plots the alignments
     """
-    fig, ax = plt.subplot()
+    plt.plot()
+    ax = plt.subplot()
     im = ax.imshow(alignment)
 
-    fig.colorbar(im)
+    plt.colorbar(im, ax=ax)
     plt.title(str(global_step) + " global steps")
-    plt.savefig(LOG_DIR + 'alignment_' + str(global_step//CHECK_VALS) + '_k.png', format='png')
+    plt.tight_layout()
+    plt.savefig(os.path.join(LOG_DIR, 'alignment_' + str(global_step//CHECK_VALS) + '_k.png'), format='png')
 
 
 def create_vocab():
@@ -104,7 +105,6 @@ def wav2spectrograms(fpath):
     audio edit
     """
     y, sample_rate = librosa.load(fpath, sr=SR)                   # load the wav file
-    
     y, _ = librosa.effects.trim(y)                          # trimming
     
     y = np.append(y[0], y[1:] - PREEMPHASIS * y[:-1])    # noise reduction technique
@@ -116,7 +116,7 @@ def wav2spectrograms(fpath):
     
     mag = np.abs(linear)
     
-    mel_basis = librosa.filters.mel(sample_rate, N_FFT, N_MELS)  # (n_mels, 1+n_fft//2)
+    mel_basis = librosa.filters.mel(SR, N_FFT, N_MELS)  # (n_mels, 1+n_fft//2)
     mel = np.dot(mel_basis, mag)  # (n_mels, t)
     
     mel = 20 * np.log10(np.maximum(1e-5, mel))
@@ -154,6 +154,7 @@ def spectrogram2wav(spectrogram):
     wav, _ = librosa.effects.trim(wav)
     return wav.astype(np.float32)
 
+    return y
 
 def griffin_lim(spectrogram):
     """Applies Griffin-Lim's raw."""
@@ -168,23 +169,31 @@ def griffin_lim(spectrogram):
     
     return y
 
-
 def create_spectrograms(fpath):
     fname = os.path.basename(fpath)
     mel, mag = wav2spectrograms(fpath)
+
     t = mel.shape[0]
-    num_paddings = 3 - (t % 3) if t % 3 != 0 else 0 # for reduction using 3 as reduction factor
+
+    num_paddings = REDUCTION_FACTOR - (t % REDUCTION_FACTOR) \
+        if t % REDUCTION_FACTOR != 0 else 0
+
     mel = np.pad(mel, [[0, num_paddings], [0, 0]], mode="constant")
     mag = np.pad(mag, [[0, num_paddings], [0, 0]], mode="constant")
     
-    return fname, mel.reshape((-1, N_MELS*3)), mag
+    return fname, mel.reshape((-1, N_MELS*REDUCTION_FACTOR)), mag
 
 def wav2drawing(fpath):
     sample_rate, samples = wavfile.read(fpath)
-    frequencies, times, spectogram = signal.spectrogram(samples, sample_rate)
+    frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
     
-    plt.pcolormesh(times, frequencies, spectogram)
-    plt.imshow(spectogram)
+    plt.pcolormesh(times, frequencies, spectrogram)
+    plt.imshow(spectrogram)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
+
+if __name__ == "__main__":
+    path = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data\\Garrett\\g24.wav'
+    _, mag = wav2spectrograms(path)
+    plot_alignments(mag, global_step=1000)

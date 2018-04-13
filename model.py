@@ -6,15 +6,15 @@ from dataload import get_batch
 import tensorflow as tf
 from networks import encoder, decoder
 from utils import spectrogram2wav, learning_rate_decay
-from config import N_MELS, REDUCTION_FACTOR, N_FFT, EMBED_SIZE, SR
+from config import N_MELS, REDUCTION_FACTOR, N_FFT, SR
 from cbhg import cbhg_helper
-
 
 class Model:
     """
     Generate the Tensorflow graph
     """
     def __init__(self, mode="train"):
+        print("Loading your model...")
         self.mode = mode
         # Initialize values used in function
         self.global_step = None
@@ -50,15 +50,15 @@ class Model:
 
         # Networks
         with tf.variable_scope("Networks"):
-            print("Beginning the encoder...")
+            print("Loading the encoder...")
             # encoder
             self.memory = encoder(self.txt, is_training=self.is_training)
 
-            print("Beginning the decoder...")
+            print("Loading the decoder...")
             # decoder
             self.mel_hat, self.alignments = decoder(self.decoder_inputs, self.memory, is_training=self.is_training)
 
-            print("The final CBHG module...")
+            print("Loading the post CBHG module...")
             # CBHG Module
             self.mags_hat = cbhg_helper(self.mel_hat, N_MELS, is_training=self.is_training, post=True)
 
@@ -68,15 +68,15 @@ class Model:
 
         # Training and evaluation
         if mode in ("train", "eval"):
-            print("Loss")
+            print("Generating Loss...")
             # Loss
             self.loss = self.get_loss()
 
-            print("Optimize")
+            print("Getting the optimizer ready...")
             # Training Scheme
             self.optimize()
 
-            print("Summarize")
+            print("Setting up your summary...")
             self.summarize()
 
     def get_loss(self):
@@ -105,13 +105,14 @@ class Model:
         """
         Summarize the training
         """
-        tf.summary.scalar('mode: %s \n mel loss: ' % self.mode, self.mel_loss)
-        tf.summary.scalar('mag loss:', self.mag_loss)
-        tf.summary.scalar('total loss:', self.loss)
-        tf.summary.scalar('learning rate: ', self.learning_rate)
-        tf.summary.image('Mel input:', tf.expand_dims(self.mels, -1), max_outputs=1)
-        tf.summary.image('Mel output:', tf.expand_dims(self.mel_hat, -1), max_outputs=1)
-        tf.summary.image('Mag input:', tf.expand_dims(self.mags, -1), max_outputs=1)
-        tf.summary.image('Mag output:', tf.expand_dims(self.mags_hat, -1), max_outputs=1)
-        tf.summary.audio('Audio:', tf.expand_dims(self.audio_out, 0), SR)
+        tf.summary.scalar('mode_%s\nmel_loss' % self.mode, self.mel_loss)
+        tf.summary.scalar('mag_loss', self.mag_loss)
+        tf.summary.scalar('total_loss', self.loss)
+        tf.summary.scalar('learning_rate', self.learning_rate)
+        tf.summary.image('Mel_input', tf.expand_dims(self.mels, -1), max_outputs=1)
+        tf.summary.image('Mel_output', tf.expand_dims(self.mel_hat, -1), max_outputs=1)
+        tf.summary.image('Mag_input', tf.expand_dims(self.mags, -1), max_outputs=1)
+        tf.summary.image('Mag_output', tf.expand_dims(self.mags_hat, -1), max_outputs=1)
+        tf.summary.audio('Audio', tf.expand_dims(self.audio_out, 0), SR)
         self.merged = tf.summary.merge_all()
+

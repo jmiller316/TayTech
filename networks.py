@@ -15,15 +15,15 @@ def encoder(inputs, is_training=True, scope="encoder"):
         
     """
     # Get encoder/decoder inputs
-    print("Get encoder inputs...")
+    print("Getting encoder inputs...")
     encoder_inputs = embed(inputs, VOCAB_SIZE, EMBED_SIZE)
     # Networks
     with tf.variable_scope(scope):
         # Encoder pre-net
-        print("Pre-net")
+        print("Generating the Pre-Net...")
         pre_out = pre_net(encoder_inputs, is_training=is_training)
         # Run CBHG
-        print("CBHB round 1")
+        print("Loading the CBHG...")
         cbhg_net = cbhg_helper(inputs=pre_out, lengths=EMBED_SIZE//2, is_training=is_training)
     return cbhg_net
 
@@ -49,6 +49,8 @@ def pre_net(inputs, is_training=True, num_hidden_units=None, scope="Pre-Net"):
     Apply a set of non-linear transformations, collectively called a "pre-net",
     to each embedding.
     """
+
+
     if num_hidden_units is None:
         num_hidden_units = [EMBED_SIZE, EMBED_SIZE // 2]
     
@@ -80,7 +82,7 @@ def decoder(inputs, memory, is_training=True, scope="decoder"):
         # Transpose
         alignments = tf.transpose(state.alignment_history.stack(), [1,2,0])
 
-        # Decoder RNNs - 2-Layer Resiedual GRU (256 cells)
+        # Decoder RNNs - 2-Layer Residual GRU (256 cells)
         outputs += decoder_rnn(outputs, scope="decoder_rnn1")
         outputs += decoder_rnn(outputs, scope="decoder_rnn2")
         
