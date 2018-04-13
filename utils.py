@@ -87,8 +87,7 @@ def plot_alignments(alignment, global_step):
 
 def create_vocab():
     """
-    text input edit
-    """
+    text inpu
     char2idx = {char: idx for idx, char in enumerate(VOCAB)}
     idx2char = {idx: char for idx, char in enumerate(VOCAB)}
     return char2idx,idx2char
@@ -97,6 +96,7 @@ def create_vocab():
 def normalize_text(text):
     # room for more normalization depending on transcript data
     text = text.lower().replace(",",".")
+    text = text.replace("-"," ")
     return text
 
 
