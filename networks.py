@@ -12,7 +12,6 @@ def encoder(inputs, is_training=True, scope="encoder"):
     """
     Encoder for the input sequence.
     Embeds the character sequence -> Runs through the pre-net -> CBHG Module
-        
     """
     # Get encoder/decoder inputs
     print("Getting encoder inputs...")
@@ -49,8 +48,6 @@ def pre_net(inputs, is_training=True, num_hidden_units=None, scope="Pre-Net"):
     Apply a set of non-linear transformations, collectively called a "pre-net",
     to each embedding.
     """
-
-
     if num_hidden_units is None:
         num_hidden_units = [EMBED_SIZE, EMBED_SIZE // 2]
     

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  9 21:18:54 2018
-
-@author: jared
+Load the data for the model
 """
 import numpy as np
 import tensorflow as tf
@@ -12,6 +10,7 @@ import os
 from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING, NUM_EPOCHS
 
 def input_load():
+    """ Grab the text files and wav file names created by Garrett, Colin, and David and return them"""
     # creates vocab conversion dictionaries
     char2idx, _ = create_vocab()
     fpaths, text_lengths, texts = [], [], []
@@ -23,7 +22,9 @@ def input_load():
     transcript_c = os.path.join(base_path_c, 'Colin Freeman Audio Text.txt')
     transcript_d = os.path.join(base_path_d, 'transcript.csv')
 
+    # Each epoch
     for _ in range(NUM_EPOCHS):
+        # Garrett
         lines = codecs.open(transcript_g, 'r', ENCODING).readlines()
         line_number = 0
         for line in lines:
@@ -46,6 +47,7 @@ def input_load():
 
             texts.append(np.array(text, np.int32).tostring())
 
+        # Colin
         lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
         line_number = 0
         for line in lines:
@@ -88,29 +90,36 @@ def input_load():
     return fpaths, text_lengths, texts
 
 def get_batch():
-    with tf.device(DEVICE): #this uses your primary gpu use ('/cpu:0') to use your cpu instead
+    """ Generate the batches """
+    with tf.device(DEVICE): # You should set the DEVICE in the config file
 
+        # load the data
         fpaths, text_lengths, texts = input_load()
         maxlen, minlen = max(text_lengths), min(text_lengths)
 
+        # determine number of batches
         num_batch = len(fpaths) // BATCH_SIZE
-        
+
+        # Tensors
         fpaths = tf.convert_to_tensor(fpaths)
         text_lengths = tf.convert_to_tensor(text_lengths)
         texts = tf.convert_to_tensor(texts)
-        
+
         fpath, text_length, text = tf.train.slice_input_producer([fpaths, text_lengths, texts], shuffle=True) #forms queues from lists
-        
+
+        # Set i[ fpr creatomg s[ectpgra,s
         fname, mel, mag = tf.py_func(create_spectrograms, [fpath], [tf.string, tf.float32, tf.float32])
 
         # Parse
         text = tf.decode_raw(text, tf.int32)  # (None,)
 
+        # Set shape
         fname.set_shape(())
         text.set_shape((None,))
         mel.set_shape((None, N_MELS*REDUCTION_FACTOR))
         mag.set_shape((None, N_FFT//2+1))
 
+        # Get buckets
         _, (texts, mels, mags, fnames) = tf.contrib.training.bucket_by_sequence_length(
                                             input_length=text_length,
                                             tensors=[text, mel, mag, fname],
