@@ -11,13 +11,10 @@ import codecs
 import os
 from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING, NUM_EPOCHS
 
-
-
 def input_load():
     # creates vocab conversion dictionaries
     char2idx, _ = create_vocab()
     fpaths, text_lengths, texts = [], [], []
-
     base_path = os.path.join(DATA_PATH, 'data')
     base_path_g = os.path.join(base_path, 'Garrett')
     base_path_c = os.path.join(base_path, 'Colin')
@@ -46,22 +43,21 @@ def input_load():
             text = normalize_text(text) + "$"  # $: EOS
             text = [char2idx[char] for char in text]
             text_lengths.append(len(text))
+
             texts.append(np.array(text, np.int32).tostring())
 
-        """
         lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
         line_number = 0
         for line in lines:
             if line == "" or line == "\n":
                 continue
             line_number += 1
-            print(line_number, line)
             text, fname = line.strip().split("$")
             fname = fname.strip()
             if not fname:
                 fpath = os.path.join(base_path_c,"C" + line_number + ".wav")
             else:
-                fpath = os.path.join(base_path_c, fname + ".wav")
+                fpath = os.path.join(base_path_c, fname)
 
             fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
 
@@ -70,7 +66,7 @@ def input_load():
             text_lengths.append(len(text))
             texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
 
-    
+    """
     lines = codecs.open(transcript_d, 'r', 'utf-8').readlines()
     line_number = 0
     for line in lines:
@@ -125,3 +121,4 @@ def get_batch():
                                             dynamic_pad=True)
 
         return texts, mels, mags, fnames, num_batch
+

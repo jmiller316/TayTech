@@ -4,7 +4,7 @@ config.py
 Several constants used in the project
 """
 ENCODING = 'UTF-8'
-NUM_EPOCHS = 20
+NUM_EPOCHS = 35
 # JARED fill this in with the characters you are using and the 
 # number of characters 
 VOCAB_SIZE = 32
@@ -24,15 +24,15 @@ DEVICE = '/cpu:0'
 SR = 22050 # Sample rate.
 # 80 band mel scale spetrogram
 N_MELS = 80
-N_FFT = 2048 # fft points (samples)
+N_FFT = 2048  # fft points (samples)
 MAX_DB = 100
 REF_DB = 20
-FRAME_SHIFT = 0.0125 # seconds
-FRAME_LENGTH = 0.05 # seconds
-HOP_LENGTH = int(SR*FRAME_SHIFT) # samples.
-WIN_LENGTH = int(SR*FRAME_LENGTH) # samples.
-POWER = 1.2 # Exponent for amplifying the predicted magnitude
-N_ITER = 50 # Number of inversion iterations
+FRAME_SHIFT = 0.0125  # seconds
+FRAME_LENGTH = 0.05  # seconds
+HOP_LENGTH = int(SR*FRAME_SHIFT)  # samples.
+WIN_LENGTH = int(SR*FRAME_LENGTH)  # samples.
+POWER = 1.2  # Exponent for amplifying the predicted magnitude
+N_ITER = 50  # Number of inversion iterations
 PREEMPHASIS = .97 # or None
 BATCH_SIZE = 20
 CHECK_VALS = 5
