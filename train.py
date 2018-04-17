@@ -16,7 +16,7 @@ def train():
     loss_sum = 0
 
     check_path = os.path.join(LOG_DIR, 'model')
-    check_path2 = os.path.join(LOG_DIR, 'model.meta-320.meta')
+    check_path2 = os.path.join(LOG_DIR, 'model.ckpt-100.meta')
 
     g = Model()
     print("Graph for training loaded.")
@@ -24,9 +24,10 @@ def train():
     # Session
     with tf.Session() as sess:
         saver = tf.train.Saver()
-        if os.path.isfile(check_path):
-            saver = tf.train.import_meta_graph(check_path)
-            saver.restore(sess, tf.train.latest_checkpoint('./'))
+        if os.path.isfile(check_path2):
+            print("LOADED")
+            saver = tf.train.import_meta_graph(check_path2)
+            saver.restore(sess, tf.train.latest_checkpoint(LOG_DIR))
 
         # run and initialize
         sess.run(tf.global_variables_initializer())
@@ -61,8 +62,6 @@ def train():
 
                 # plot alignments
                 plot_alignments(alignments, global_step=g_step)
-
-    sess.close()
 
 
 if __name__ == '__main__':

@@ -38,7 +38,10 @@ class Model:
         # Load inputs
         if self.is_training:
             self.txt, self.mels, self.mags, self.file_names, self.num_batch = get_batch()
-        else:
+        elif mode == "synthesize":
+            self.txt = tf.placeholder(tf.int32, shape=(None, None))
+            self.mels = tf.placeholder(tf.float32, shape=(None, None, N_MELS*REDUCTION_FACTOR))
+        else: # eval
             self.txt = tf.placeholder(tf.int32, shape=(None, None))
             self.mels = tf.placeholder(tf.float32, shape=(None, None, N_MELS*REDUCTION_FACTOR))
             self.mags = tf.placeholder(tf.float32, shape=(None, None, 1+ N_FFT//2))
