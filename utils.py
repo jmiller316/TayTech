@@ -1,14 +1,14 @@
 """
 utils.py
 
-Miscellaneous functions that used by other files.
-Includes all functions related to spectrograms
+Miscellaneous functions that we will need.
 """
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import librosa
 import numpy as np
 import os
+import re
 from scipy import signal
 import copy
 from scipy.io import wavfile
@@ -99,6 +99,9 @@ def normalize_text(text):
     # room for more normalization depending on transcript data
     text = text.lower().replace(",",".")
     text = text.replace("-"," ")
+    text = text.replace("\"","")
+    text = text.replace(";",".")
+    text = re.sub("[^{}]".format(VOCAB), " ", text)
     return text
 
 
@@ -196,6 +199,6 @@ def wav2drawing(fpath):
     plt.show()
 
 if __name__ == "__main__":
-    path = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data\\Garrett\\g24.wav'
+    path = 'C:\\Users\\jared\\AIDATA\\data\\wavs\\LJ050-0251.wav'
     _, mag = wav2spectrograms(path)
     plot_alignments(mag, global_step=1000)

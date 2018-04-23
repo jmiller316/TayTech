@@ -1,12 +1,12 @@
 from model import Model
 import tensorflow as tf
-from utils import plot_alignments
+from utils import plot_alignments, spectrogram2wav
 from config import CHECK_VALS, LOG_DIR, SR
+import numpy as np
 import librosa
 import os
 from tqdm import tqdm
 import time
-
 
 def train():
     # Stats
@@ -14,7 +14,7 @@ def train():
     time_sum = 0
     loss_count = 0
     loss_sum = 0
-
+    tf.reset_default_graph() 
     check_path = os.path.join(LOG_DIR, 'model')
     check_path2 = os.path.join(LOG_DIR, 'model.ckpt-100.meta')
 
@@ -31,11 +31,10 @@ def train():
 
         # run and initialize
         sess.run(tf.global_variables_initializer())
-        coord = tf.train.Coordinator()
-        tf.train.start_queue_runners(sess=sess, coord=coord)
+        tf.train.start_queue_runners(sess=sess)
 
         # Run the session
-        for i in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
+        for i in tqdm(range(g.num_batch)):
             start_time = time.time()
             g_step, g_loss, g_opt = sess.run([g.global_step, g.loss, g.opt_train])
 
