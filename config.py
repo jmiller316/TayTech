@@ -4,7 +4,7 @@ config.py
 Several constants used in the project
 """
 ENCODING = 'UTF-8'
-NUM_EPOCHS = 35
+NUM_EPOCHS = 1
 # JARED fill this in with the characters you are using and the 
 # number of characters 
 VOCAB_SIZE = 32
@@ -16,8 +16,10 @@ DROPOUT_RATE = 0.5
 REDUCTION_FACTOR = 2 # This value can be changed. In the Tacotron paper, 
                      # the number 2 was used. The paper said, however,
                      # that numbers as large as 5 worked well
-LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data_log'
+LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data_lj_1'
 DATA_PATH = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project'
+SAVE_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\synth_lj_1'
+TEST_DATA = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\test_data.txt'
 DEVICE = '/cpu:0'
 # Signal Processing
 # JARED we need to look at these values since they depend on the data
@@ -34,5 +36,5 @@ WIN_LENGTH = int(SR*FRAME_LENGTH)  # samples.
 POWER = 1.2  # Exponent for amplifying the predicted magnitude
 N_ITER = 50  # Number of inversion iterations
 PREEMPHASIS = .97 # or None
-BATCH_SIZE = 20
+BATCH_SIZE = 32
 CHECK_VALS = 5

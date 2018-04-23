@@ -80,7 +80,7 @@ class Synthesizer:
 
 if __name__ == "__main__":
     synth = Synthesizer()
-    synth.synthesize(os.path.join(LOG_DIR, 'model-320.meta'), text=['penguins. penguins everywhere',
+    synth.synthesize(os.path.join(LOG_DIR, 'model-3250.meta'), text=['penguins. penguins everywhere',
                      'what the heck am i doing with my life',
                      'all around me are familiar faces',
                      'worn out faces',

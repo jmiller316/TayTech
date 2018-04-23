@@ -7,9 +7,10 @@ import tensorflow as tf
 from utils import create_vocab, normalize_text, create_spectrograms
 import codecs
 import os
-from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING, NUM_EPOCHS
+from config import N_MELS, REDUCTION_FACTOR, N_FFT, BATCH_SIZE, DATA_PATH, DEVICE, ENCODING, NUM_EPOCHS, TEST_DATA
 
-def input_load():
+
+def input_load(mode="train"):
     """ Grab the text files and wav file names created by Garrett, Colin, and David and return them"""
     # creates vocab conversion dictionaries
     char2idx, _ = create_vocab()
@@ -23,71 +24,84 @@ def input_load():
     transcript_d = os.path.join(base_path_d, 'transcript.csv')
 
     # Each epoch
-    for _ in range(NUM_EPOCHS):
-        # Garrett
-        lines = codecs.open(transcript_g, 'r', ENCODING).readlines()
-        line_number = 0
-        for line in lines:
-            if line == "" or line == "\n":
-                continue
-            line_number += 1
-            text, fname = line.strip().split("$")
-            fname = fname.strip()
-            if not fname:
-                fpath = os.path.join(base_path_g,
-                                     "G" + line_number + ".wav")
-            else:
-                fpath = os.path.join(base_path_g, fname)
+    if mode in ("train", "eval"):
 
-            fpaths.append(fpath)                                        # queue of fpaths containing all the wavfiles
+        for _ in range(NUM_EPOCHS):
+            lines = codecs.open(transcript_g, 'r', ENCODING).readlines()
+            line_number = 0
+            for line in lines:
+                if line == "" or line == "\n":
+                    continue
+                line_number += 1
+                text, fname = line.strip().split("$")
+                fname = fname.strip()
+                if not fname:
+                    fpath = os.path.join(base_path_g,
+                                         "G" + line_number + ".wav")
+                else:
+                    fpath = os.path.join(base_path_g, fname)
 
-            text = normalize_text(text) + "$"  # $: EOS
-            text = [char2idx[char] for char in text]
-            text_lengths.append(len(text))
+                fpaths.append(fpath)  # queue of fpaths containing all the wavfiles
 
-            texts.append(np.array(text, np.int32).tostring())
+                text = normalize_text(text) + "$"  # $: EOS
+                text = [char2idx[char] for char in text]
+                text_lengths.append(len(text))
 
-        # Colin
-        lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
-        line_number = 0
-        for line in lines:
-            if line == "" or line == "\n":
-                continue
-            line_number += 1
-            text, fname = line.strip().split("$")
-            fname = fname.strip()
-            if not fname:
-                fpath = os.path.join(base_path_c,"C" + line_number + ".wav")
-            else:
-                fpath = os.path.join(base_path_c, fname)
+                texts.append(np.array(text, np.int32).tostring())
 
-            fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
+            # Colin
+            lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
+            line_number = 0
+            for line in lines:
+                if line == "" or line == "\n":
+                    continue
+                line_number += 1
+                text, fname = line.strip().split("$")
+                fname = fname.strip()
+                if not fname:
+                    fpath = os.path.join(base_path_c, "C" + line_number + ".wav")
+                else:
+                    fpath = os.path.join(base_path_c, fname)
 
-            text = normalize_text(text) + "$"  # E: EOS
-            text = [char2idx[char] for char in text]
-            text_lengths.append(len(text))
-            texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
+                fpaths.append(fpath)  # queue of fpaths containing all the wavfiles
 
-    """
-    lines = codecs.open(transcript_d, 'r', 'utf-8').readlines()
-    line_number = 0
-    for line in lines:
-        line_number += 1
-        text, fname = line.strip().split("$")
-        fname = fname.strip()
-        if not fname: 
-            fpath = os.path.join(base_path_d,"D" + line_number + ".wav")
-        else:
-            fpath = os.path.join(base_path_d, fname + ".wav")
-            
-        fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
+                text = normalize_text(text) + "$"  # E: EOS
+                text = [char2idx[char] for char in text]
+                text_lengths.append(len(text))
+                texts.append(np.array(text, np.int32).tostring())  # queue of converted transcript text lines
 
-        text = normalize_text(text) + "$"  # E: EOS
-        text = [char2idx[char] for char in text]
-        text_lengths.append(len(text))
-        texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
-        """
-    return fpaths, text_lengths, texts
+            """
+            lines = codecs.open(transcript_d, 'r', 'utf-8').readlines()
+            line_number = 0
+            for line in lines:
+                line_number += 1
+                text, fname = line.strip().split("$")
+                fname = fname.strip()
+                if not fname: 
+                    fpath = os.path.join(base_path_d,"D" + line_number + ".wav")
+                else:
+                    fpath = os.path.join(base_path_d, fname + ".wav")
+    
+                fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
+    
+                text = normalize_text(text) + "$"  # E: EOS
+                text = [char2idx[char] for char in text]
+                text_lengths.append(len(text))
+                texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
+                """
+        return fpaths, text_lengths, texts
+    else:
+        # Parse
+        lines = codecs.open(TEST_DATA, 'r', 'utf-8').readlines()[1:]
+        sents = [normalize_text(line.split(" ", 1)[-1]).strip() + "E" for line in
+                    lines]  # text normalization, E: EOS
+        lengths = [len(sent) for sent in sents]
+        maxlen = sorted(lengths, reverse=True)[0]
+        texts = np.zeros((len(sents), maxlen), np.int32)
+        for i, sent in enumerate(sents):
+            texts[i, :len(sent)] = [char2idx[char] for char in sent]
+        return texts
+
 
 def get_batch():
     """ Generate the batches """

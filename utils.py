@@ -1,7 +1,8 @@
 """
 utils.py
 
-Miscellaneous functions that we will need.
+Miscellaneous functions that used by other files.
+Includes all functions related to spectrograms
 """
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -79,7 +80,7 @@ def plot_alignments(alignment, global_step):
     ax = plt.subplot()
     im = ax.imshow(alignment)
 
-    plt.colorbar(im, ax=ax)
+    #plt.colorbar(im, ax=ax)
     plt.title(str(global_step) + " global steps")
     plt.tight_layout()
     plt.savefig(os.path.join(LOG_DIR, 'alignment_' + str(global_step//CHECK_VALS) + '_k.png'), format='png')
