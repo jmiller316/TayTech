@@ -1,6 +1,6 @@
 from model import Model
 import tensorflow as tf
-from utils import plot_alignments, spectrogram2wav
+from utils import plot_alignments,
 from config import CHECK_VALS, LOG_DIR, SR
 import numpy as np
 import librosa
@@ -31,10 +31,11 @@ def train():
 
         # run and initialize
         sess.run(tf.global_variables_initializer())
-        tf.train.start_queue_runners(sess=sess)
+        coord = tf.train.Coordinator()
+        tf.train.start_queue_runners(sess=sess, coord=coord)
 
         # Run the session
-        for i in tqdm(range(g.num_batch)):
+        for i in tqdm(range(g.num_batch), total=g.num_batch, ncols=70, leave=False, unit='b'):
             start_time = time.time()
             g_step, g_loss, g_opt = sess.run([g.global_step, g.loss, g.opt_train])
 
