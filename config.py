@@ -19,10 +19,14 @@ REDUCTION_FACTOR = 2 # This value can be changed. In the Tacotron paper,
 """ #Sabrinas
 LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data_log'
 DATA_PATH = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project'
+TEST_DATA = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\test_data.txt'
+SAVE_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\synth_lj_1'
 DEVICE = '/cpu:0'
 """ #Jareds
 LOG_DIR = 'C:\\Users\\jared\\AIDATA\\data'
 DATA_PATH = 'C:\\Users\\jared\\AIDATA'
+TEST_DATA = 'C:\\Users\\jared\\AIDATA\\test_data.txt'
+SAVE_DIR = 'C:\\Users\\jared\\AIDATA\\synth_lj_1'
 DEVICE = '/cpu:0'
 # Signal Processing
 # JARED we need to look at these values since they depend on the data
