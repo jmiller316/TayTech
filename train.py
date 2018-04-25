@@ -1,6 +1,6 @@
 from model import Model
 import tensorflow as tf
-from utils import plot_alignments,
+from utils import plot_alignments
 from config import CHECK_VALS, LOG_DIR, SR
 import numpy as np
 import librosa

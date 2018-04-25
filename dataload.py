@@ -40,84 +40,18 @@ def input_load(mode="train"):
                 text = [char2idx[char] for char in text]
                 text_lengths.append(len(text))
                 texts.append(np.array(text, np.int32).tostring())
-            
-        """ #Commented out to use a different dataset
-        # Garrett
-        lines = codecs.open(transcript_g, 'r', ENCODING).readlines()
-        line_number = 0
-        for line in lines:
-            if line == "" or line == "\n":
-                continue
-            line_number += 1
-            text, fname = line.strip().split("$")
-            fname = fname.strip()
-            if not fname:
-                fpath = os.path.join(base_path_g,
-                                     "G" + line_number + ".wav")
-            else:
-                fpath = os.path.join(base_path_g, fname)
-
-            fpaths.append(fpath)                                        # queue of fpaths containing all the wavfiles
-
-            text = normalize_text(text) + "$"  # $: EOS
-            text = [char2idx[char] for char in text]
-            text_lengths.append(len(text))
-
-            texts.append(np.array(text, np.int32).tostring())
-
-        # Colin
-        lines = codecs.open(transcript_c, 'r', ENCODING).readlines()
-        line_number = 0
-        for line in lines:
-            if line == "" or line == "\n":
-                continue
-            line_number += 1
-            text, fname = line.strip().split("$")
-            fname = fname.strip()
-            if not fname:
-                fpath = os.path.join(base_path_c,"C" + line_number + ".wav")
-            else:
-                fpath = os.path.join(base_path_c, fname)
-
-            fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
-
-            text = normalize_text(text) + "$"  # E: EOS
-            text = [char2idx[char] for char in text]
-            text_lengths.append(len(text))
-            texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
-        """
-        
-    """ DON'T Uncomment this doesn't access anything
-    lines = codecs.open(transcript_d, 'r', 'utf-8').readlines()
-    line_number = 0
-    for line in lines:
-        line_number += 1
-        text, fname = line.strip().split("$")
-        fname = fname.strip()
-        if not fname: 
-            fpath = os.path.join(base_path_d,"D" + line_number + ".wav")
-        else:
-            fpath = os.path.join(base_path_d, fname + ".wav")
-            
-        fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
-
-        text = normalize_text(text) + "$"  # E: EOS
-        text = [char2idx[char] for char in text]
-        text_lengths.append(len(text))
-        texts.append(np.array(text, np.int32).tostring())           #queue of converted transcript text lines
-        """
         return fpaths, text_lengths, texts
-    else:	+        fname = fname.strip()
--        # Parse	+        if not fname: 
--        lines = codecs.open(TEST_DATA, 'r', 'utf-8').readlines()[1:]	+            fpath = os.path.join(base_path_d,"D" + line_number + ".wav")
--        sents = [normalize_text(line.split(" ", 1)[-1]).strip() + "E" for line in	+        else:
--                    lines]  # text normalization, E: EOS	+            fpath = os.path.join(base_path_d, fname + ".wav")
--        lengths = [len(sent) for sent in sents]	+            
--        maxlen = sorted(lengths, reverse=True)[0]	+        fpaths.append(fpath)                                        #queue of fpaths containing all the wavfiles
--        texts = np.zeros((len(sents), maxlen), np.int32)	+
--        for i, sent in enumerate(sents):	+        text = normalize_text(text) + "$"  # E: EOS
--            texts[i, :len(sent)] = [char2idx[char] for char in sent]	+        text = [char2idx[char] for char in text]
--        return texts
+    else:
+        # Parse
+        lines = codecs.open(TEST_DATA, 'r', 'utf-8').readlines()[1:]
+        sents = [normalize_text(line.split(" ", 1)[-1]).strip() + "$" for line in
+                    lines]  # text normalization, E: EOS
+        lengths = [len(sent) for sent in sents]
+        maxlen = sorted(lengths, reverse=True)[0]
+        texts = np.zeros((len(sents), maxlen), np.int32)
+        for i, sent in enumerate(sents):
+            texts[i, :len(sent)] = [char2idx[char] for char in sent]
+        return texts
 
 
 def get_batch():
