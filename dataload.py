@@ -15,14 +15,14 @@ def input_load(mode="train"):
     char2idx, _ = create_vocab()
     fpaths, text_lengths, texts = [], [], []
     
-    base_path = os.path.join(DATA_PATH, 'data')
-    base_path_g = os.path.join(base_path, 'Garrett')
-    base_path_c = os.path.join(base_path, 'Colin')
-    base_path_d = os.path.join(base_path, 'David')
-    base_path_x = os.path.join(base_path, 'wavs')
-    transcript_g = os.path.join(base_path_g, 'AudioTranscript.txt')
-    transcript_c = os.path.join(base_path_c, 'Colin Freeman Audio Text.txt')
-    transcript_d = os.path.join(base_path_d, 'transcript.csv')
+    #base_path = os.path.join(DATA_PATH, 'data')
+    #base_path_g = os.path.join(base_path, 'Garrett')
+    #base_path_c = os.path.join(base_path, 'Colin')
+    #base_path_d = os.path.join(base_path, 'David')
+    base_path_x = os.path.join(DATA_PATH, 'wavs')
+    #transcript_g = os.path.join(base_path_g, 'AudioTranscript.txt')
+    #transcript_c = os.path.join(base_path_c, 'Colin Freeman Audio Text.txt')
+    #transcript_d = os.path.join(base_path_d, 'transcript.csv')
     transcript_x = os.path.join(base_path_x, 'metadata.csv')
     
     if mode in ("train", "eval"):
