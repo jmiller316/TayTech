@@ -24,7 +24,7 @@ SAVE_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\syn
 DEVICE = '/cpu:0'
 """ #Jareds
 LOG_DIR = 'C:\\Users\\jared\\AIDATA\\data'
-DATA_PATH = 'C:\\Users\\jared\\AIDATA'
+DATA_PATH = 'C:\\Users\\jared\\AIDATA\\data'
 TEST_DATA = 'C:\\Users\\jared\\AIDATA\\test_data.txt'
 SAVE_DIR = 'C:\\Users\\jared\\AIDATA\\synth_lj_1'
 DEVICE = '/cpu:0'
