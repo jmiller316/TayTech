@@ -1,4 +1,6 @@
 """
+model.py by TayTech
+
 Contains the class for the main model
 """
 
@@ -9,14 +11,20 @@ from utils import spectrogram2wav, learning_rate_decay
 from config import N_MELS, REDUCTION_FACTOR, N_FFT, SR
 from cbhg import cbhg_helper
 
+
 class Model:
     """
     Generate the Tensorflow graph
     """
     def __init__(self, mode="train"):
+        """
+        Initialize the class based off of the given mode
+        :param mode: the mode to load the model based on
+        """
         print("Loading your model...")
+
+        # Initialize values used in class
         self.mode = mode
-        # Initialize values used in function
         self.global_step = None
         self.mel_loss = None
         self.mel_loss = None
@@ -27,6 +35,7 @@ class Model:
         self.gradients = None
         self.clipped = None
         self.gvs = None
+        self.opt_train = None
 
         # If is_training
         if mode == "train":
@@ -41,10 +50,10 @@ class Model:
         elif mode == "synthesize":
             self.txt = tf.placeholder(tf.int32, shape=(None, None))
             self.mels = tf.placeholder(tf.float32, shape=(None, None, N_MELS*REDUCTION_FACTOR))
-        else: # eval
+        else:  # eval
             self.txt = tf.placeholder(tf.int32, shape=(None, None))
             self.mels = tf.placeholder(tf.float32, shape=(None, None, N_MELS*REDUCTION_FACTOR))
-            self.mags = tf.placeholder(tf.float32, shape=(None, None, 1+ N_FFT//2))
+            self.mags = tf.placeholder(tf.float32, shape=(None, None, 1 + N_FFT//2))
             self.file_names = tf.placeholder(tf.string, shape=(None,))      
 
         # decoder inputs
@@ -85,6 +94,7 @@ class Model:
     def get_loss(self):
         """
         Determine the loss of the outputs
+        :return: the loss
         """
         self.mel_loss = tf.reduce_mean(tf.abs(self.mel_hat - self.mels))
         self.mag_loss = tf.reduce_mean(tf.abs(self.mags_hat - self.mags))
@@ -94,8 +104,11 @@ class Model:
         """
         Optimize the learning rate.
         """
+        # global step
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
+        # learning rate decay
         self.learning_rate = learning_rate_decay(global_step=self.global_step)
+        # optimizer
         self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
 
         # Gradient clipping
@@ -118,4 +131,3 @@ class Model:
         tf.summary.image('Mag_output', tf.expand_dims(self.mags_hat, -1), max_outputs=1)
         tf.summary.audio('Audio', tf.expand_dims(self.audio_out, 0), SR)
         self.merged = tf.summary.merge_all()
-
