@@ -25,16 +25,10 @@ def train():
     time_sum = 0
     loss_count = 0
     loss_sum = 0
-    #tf.reset_default_graph()
 
     # Paths
     check_path = os.path.join(LOG_DIR, 'model')
     check_path2 = os.path.join(LOG_DIR, MODEL_NAME)
-    eval_path = os.path.join(LOG_DIR, 'eval')
-
-    # create the eval folder
-    if not os.path.isdir(eval_path):
-        os.mkdir(eval_path)
 
     g = Model()
     print("Graph for training loaded.")

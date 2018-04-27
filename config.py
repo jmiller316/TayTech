@@ -14,33 +14,27 @@ DROPOUT_RATE = 0.5
 REDUCTION_FACTOR = 2    # This value can be changed. In the Tacotron paper,
                         # the number 2 was used. The paper said, however,
                         # that numbers as large as 5 worked well
- #Sabrinas
+
+# directories
 LOG_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\data_lj_1'
 MODEL_NAME = 'model-3254.meta'
-DATA_PATH = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Numerical Analysis\\LJ\LJSpeech-1.1'
+DATA_PATH = 'data/LJ/LJSpeech-1.1'
 TEST_DATA = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\test_data.txt'
 SAVE_DIR = 'C:\\Users\\Sabrina\\Documents\\UTSA\\Intro to AI\\Group Project\\synth_lj_1'
 DEVICE = '/cpu:0'
-""" #Jareds
-LOG_DIR = 'C:\\Users\\jared\\AIDATA\\data'
-DATA_PATH = 'C:\\Users\\jared\\AIDATA\\data'
-TEST_DATA = 'C:\\Users\\jared\\AIDATA\\test_data.txt'
-SAVE_DIR = 'C:\\Users\\jared\\AIDATA\\synth_lj_1'
-DEVICE = '/cpu:0'
-"""# Signal Processing
-# JARED we need to look at these values since they depend on the data
-SR = 22050 # Sample rate.
-# 80 band mel scale spetrogram
-N_MELS = 80
-N_FFT = 2048  # fft points (samples)
+
+# Signal Processing
+SR = 22050                              # Sample rate.
+N_MELS = 80                             # 80 band mel scale spectrogram
+N_FFT = 2048                            # fft points (samples)
 MAX_DB = 100
 REF_DB = 20
-FRAME_SHIFT = 0.0125  # seconds
-FRAME_LENGTH = 0.05  # seconds
-HOP_LENGTH = int(SR*FRAME_SHIFT)  # samples.
-WIN_LENGTH = int(SR*FRAME_LENGTH)  # samples.
-POWER = 1.2  # Exponent for amplifying the predicted magnitude
-N_ITER = 50  # Number of inversion iterations
-PREEMPHASIS = .97 # or None
+FRAME_SHIFT = 0.0125                    # seconds
+FRAME_LENGTH = 0.05                     # seconds
+HOP_LENGTH = int(SR*FRAME_SHIFT)        # samples.
+WIN_LENGTH = int(SR*FRAME_LENGTH)       # window length
+POWER = 1.2                             # Exponent for amplifying the predicted magnitude
+N_ITER = 50                             # Number of inversion iterations
+PREEMPHASIS = .97                       # or None
 BATCH_SIZE = 32
 CHECK_VALS = 1

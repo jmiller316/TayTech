@@ -7,9 +7,11 @@ Evaluate the model
 import numpy as np
 from dataload import input_load
 import tensorflow as tf
+import os
 from train import Model
 from utils import create_spectrograms
-from config import LOG_DIR
+from config import LOG_DIR, MODEL_NAME
+from tqdm import tqdm
 
 
 def eval_model():
@@ -36,6 +38,7 @@ def eval_model():
     saver = tf.train.Saver()
     with tf.Session() as sess:
         # restore the model
+        saver = tf.train.import_meta_graph(os.path.join(LOG_DIR, MODEL_NAME))
         saver.restore(sess, tf.train.latest_checkpoint(LOG_DIR))
         print("Restored!")
 
@@ -43,12 +46,14 @@ def eval_model():
 
         # Feed Forward
         # mels
+        print("Running session...")
         mels_hat = np.zeros((1, mels.shape[1], mels.shape[2]), np.float32)
-        for i in range(mels.shape[1]):
+        for i in tqdm(range(mels.shape[1])):
             _mels_hat = sess.run(g.mel_hat, {g.txt: text, g.mels: mels_hat})
             mels_hat[:, i, :] = _mels_hat[:, i, :]
 
         # mags
+        print("Generating summaries...")
         merged, gs = sess.run(
             [g.merged, g.global_step],
             {g.txt: text, g.mels: mels,

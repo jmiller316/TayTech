@@ -10,7 +10,7 @@ We wished to create an End-To-End Text-to-Speech model that is capable of sythes
    - `TEST_DATA`: text file used to synthesize audio if not passing in text to predict in the code
    - `SAVE_DIR`: where to save sythesized outputs
    - `DEVICE`: cpu or gpu depending on your computer
- 
+ hangin
 ## Instruction to Run
 1. Training - run `train.py` to train
 2. Evaluation - run `eval.py` to evaluate
